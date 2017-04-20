@@ -1,0 +1,24 @@
+{
+  "name": "xPromise",
+  "version": "1.0.0",
+  "description": "Promise Implementation",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahonn/xPromise.git"
+  },
+  "keywords": [],
+  "author": "Richard Jiang <ahonn95@outloo.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ahonn/xPromise/issues"
+  },
+  "homepage": "https://github.com/ahonn/xPromise#readme",
+  "dependencies": {
+    "asap": "^2.0.5",
+    "promises-aplus-tests": "^2.1.2"
+  }
+}
