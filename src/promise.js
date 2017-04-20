@@ -152,16 +152,15 @@ function PromiseJob(onFulfilled, onRejected, promise) {
 exports.defalut = Promise
 
 // Test
-// function asyncFunction() {
-    // return new Promise(function (resolve, reject) {
-        // console.log(1)
-        // setTimeout(function () {
-            // resolve('2');
-        // }, 1000);
-    // });
-// }
-// asyncFunction().then(function (v) {
-  // console.log(v)
-// })
-
+function asyncFunction() {
+    return new Promise(function (resolve, reject) {
+        setTimeout(function () {
+            resolve(1);
+        }, 1000);
+    });
+}
+console.log(asyncFunction())
+asyncFunction().then(function (v) {
+  console.log(v)
+})
 
