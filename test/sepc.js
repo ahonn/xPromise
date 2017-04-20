@@ -1,5 +1,7 @@
-var Promise = require('../src/promise.js')
+var Promise = require('../src/promise.js').defalut
 var promisesAplusTests = require('promises-aplus-tests')
+
+console.log(Promise)
 
 var adapter = {
     resolved: function (val) {

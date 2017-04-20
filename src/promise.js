@@ -42,7 +42,7 @@ function resolvePromise(promise, resolution) {
     try {
       then = resolution.then
     } catch (e) {
-      rejectPromise(promise, new TypeError)
+      rejectPromise(promise, e)
       return
     }
 
@@ -67,9 +67,7 @@ function rejectPromise(promise, reason) {
   promise._state = REJECTED
   promise._result = reason
 
-  for (var i = 0; i < promise._jobs.length; ++i) {
-    handlePromise(promise, promise._jobs[i])
-  }
+  triggerPromiseThen(promise)
 }
 
 
@@ -77,9 +75,16 @@ function fulfillPromise(promise, value) {
   promise._state = FULFILLED
   promise._result = value
 
-  for (var i = 0; i < promise._jobs.length; ++i) {
-    handlePromise(promise, promise._jobs[i])
-  }
+  triggerPromiseThen(promise)
+}
+
+
+function triggerPromiseThen(promise) {
+  var currentJob = promise._jobs.shift()
+  if (!currentJob) return
+
+  handlePromise(promise, currentJob)
+  triggerPromiseThen(promise)
 }
 
 
@@ -99,14 +104,13 @@ function handlePromise(promise, job) {
       return
     }
 
-    var res
     try {
-      res = cb(promise._result)
+      var res = cb(promise._result)
     } catch (e) {
-      rejectPromise(job.promise, new TypeError(e))
-    } finally {
-      resolvePromise(job.promise, res)
+      rejectPromise(job.promise, e)
+      return
     }
+    resolvePromise(job.promise, res)
   })
 }
 
@@ -130,15 +134,41 @@ function Promise(exector) {
   }
 }
 
+Promise.resolve = function (value) {
+  return new Promise(function (resolve) {
+    resolve(value)
+  })
+}
+
+Promise.reject = function (value) {
+  return new Promise(function (resolve, reject) {
+    reject(value)
+  })
+}
+
 Promise.prototype.then = function (onFulfilled, onRejected) {
   if (!(this instanceof Promise)) throw new TypeError
 
   var promise = this
+  var C = promise.constructor
+  if (C !== Promise) {
+    return new C(function (resolve, reject) {
+      var newPromise = new Promise(noop)
+      newPromise.then(resolve, reject)
+      var job = new PromiseJob(onFulfilled, onRejected, newPromise)
+      handlePromise(promise, job)
+    })
+  }
+
   var newPromise = new Promise(noop)
   var job = new PromiseJob(onFulfilled, onRejected, newPromise)
   handlePromise(promise, job)
 
   return newPromise
+}
+
+Promise.prototype.catch = function (onRejected) {
+  return this.then(null, onRejected)
 }
 
 function PromiseJob(onFulfilled, onRejected, promise) {
@@ -155,12 +185,15 @@ exports.defalut = Promise
 function asyncFunction() {
     return new Promise(function (resolve, reject) {
         setTimeout(function () {
-            resolve(1);
+            reject(2)
+            resolve(1)
         }, 1000);
     });
 }
 console.log(asyncFunction())
 asyncFunction().then(function (v) {
   console.log(v)
+}).catch(function (err) {
+  console.log(err)
 })
 
