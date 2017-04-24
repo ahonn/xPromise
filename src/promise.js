@@ -181,19 +181,3 @@ function PromiseJob(onFulfilled, onRejected, promise) {
 
 exports.defalut = Promise
 
-// Test
-function asyncFunction() {
-    return new Promise(function (resolve, reject) {
-        setTimeout(function () {
-            reject(2)
-            resolve(1)
-        }, 1000);
-    });
-}
-console.log(asyncFunction())
-asyncFunction().then(function (v) {
-  console.log(v)
-}).catch(function (err) {
-  console.log(err)
-})
-
